@@ -38,5 +38,40 @@ var_dump($joke->getId()); // returns 1234
 
 $joke = $blaguesApi->getRandom([Joke::TYPE_DARK]); // This will fetch any type of joke except for Joke::TYPE_DARK
 
-$joke = $blaguesApi->getByType(Joke::TYPE_DEV) // This will fetch a random joke of type Joke::TYPE_DEV
+$joke = $blaguesApi->getByType(Joke::TYPE_DEV); // This will fetch a random joke of type Joke::TYPE_DEV
+```
+
+Example using Symfony
+```php
+<?php
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Blagues\BlaguesApi;
+
+class JokeController extends AbstractController
+{
+    private ParameterBagInterface $parametersBag;
+
+    public function __construct(ParameterBagInterface $parametersBag)
+    {
+        $this->parametersBag = $parametersBag;
+    }
+
+    #[Route('/joke')]
+    public function jokeAction(): Response
+    {
+        $blaguesApi = new BlaguesApi($this->parametersBag->get('BLAGUES_API_TOKEN'));
+
+        $joke = $blaguesApi->getRandom();
+
+        return $this->render('template/joke.html.twig', [
+            "joke" => $joke,
+        ]);
+    }
+}
 ```
