@@ -1,0 +1,35 @@
+{
+    "name": "zuruuh/blagues-api",
+    "description": "PHP wrapper for blagues-api",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "zuruuh",
+            "email": "ziadi.mail.pro@gmail.com"
+        }
+    ],
+    "require": {
+      "php": ">=7.4",
+      "guzzlehttp/guzzle": "^7.4",
+      "ext-json": "*"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.6",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-strict-rules": "^1.2",
+        "phpstan/phpstan-php-parser": "^1.1",
+        "phpunit/phpunit": "^9.5",
+        "vlucas/phpdotenv": "^5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Blagues\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Test\\": "tests/"
+        }
+    }
+}
