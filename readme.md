@@ -3,6 +3,10 @@
 Blagues API is a french public api which allows anyone to create and access multiple hundreds of jokes.
 This packages allows anyone to use easily this api using an OO approach.
 
+## Authentication
+
+You can get your authentication token at https://www.blagues-api.fr
+
 ## Examples
 
 **Here are some simple examples you can use to interact with the api.**
@@ -75,3 +79,6 @@ class JokeController extends AbstractController
     }
 }
 ```
+
+## Contributing
+Check the (contributing.md)[./contributing.md] file before making any contribution to the project.
