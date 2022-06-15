@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Blagues;
 
-use Blagues\Exceptions\InvalidJokeDataException;
+use Blagues\Exceptions\ApiUnavailableException;
 use Blagues\Exceptions\InvalidJokeTypeException;
 use Blagues\Exceptions\InvalidTokenException;
 use Blagues\Exceptions\JokeException;
@@ -12,7 +14,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 
-class BlaguesApi
+class BlaguesApi implements BlaguesApiInterface
 {
     private Client $httpClient;
 
@@ -37,8 +39,16 @@ class BlaguesApi
         try {
             $res = $this->httpClient->get($uri);
         } catch (ClientException $e) {
-            if ($e->getResponse()->getStatusCode() === 401) {
-                throw new InvalidTokenException('Invalid Auth Token provided! Make sure you passed the correct one!');
+            $statusCode = $e->getResponse()->getStatusCode();
+
+            if ($statusCode === 401) {
+                throw new InvalidTokenException($e);
+            }
+            if ($statusCode === 404) {
+                return [];
+            }
+            if ($statusCode > 500) {
+                throw new ApiUnavailableException($e);
             }
 
             throw $e;
@@ -84,7 +94,7 @@ class BlaguesApi
     /**
      * @phpstan-param value-of<Joke::TYPES> $type
      *
-     * @throws JokeException
+     * @throws JokeException|GuzzleException
      */
     public function getByType(string $type): Joke
     {
@@ -96,13 +106,16 @@ class BlaguesApi
     }
 
     /**
-     * @throws JokeException
+     * @throws JokeException|GuzzleException
      */
-    public function getById(int $id): Joke
+    public function getById(int $id): ?Joke
     {
         $joke = $this->request(sprintf('/api/id/%d', $id));
+        if ($joke) {
+            return Joke::createFromJson($joke);
+        }
 
-        return Joke::createFromJson($joke);
+        return null;
     }
 
     /**
@@ -111,7 +124,9 @@ class BlaguesApi
     private function validateType(string $type): void
     {
         if (!in_array($type, Joke::TYPES)) {
-            throw new InvalidJokeTypeException('Joke type "' . $type . '" does not exist! Make sure to use one of the following types: ' . implode(', ', Joke::TYPES));
+            $message = sprintf('Joke type "%s" does not exist! Make sure to use one of the following types: %s', $type, implode(', ', Joke::TYPES));
+
+            throw new InvalidJokeTypeException($message);
         }
     }
 }
