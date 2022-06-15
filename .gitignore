@@ -1,3 +1,7 @@
 /vendor
-/phpstan.neon
 /.env
+/.phpunit.result.cache
+
+/phpstan.neon
+/phpunit.xml
+/phpcs.xml
