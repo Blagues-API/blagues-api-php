@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Test;
 
 use Blagues\BlaguesApi;
+use Blagues\BlaguesApiFactory;
+use Blagues\BlaguesApiInterface;
 use Blagues\Exceptions\InvalidJokeDataException;
 use Blagues\Exceptions\JokeException;
 use Blagues\Models\Joke;
@@ -11,20 +15,17 @@ use PHPUnit\Framework\TestCase;
 
 class BlaguesApiTest extends TestCase
 {
-    private static BlaguesApi $api;
-
     public static function setUpBeforeClass(): void
     {
         $env = Dotenv::createImmutable((string) realpath(__DIR__ . '/../'), '.env');
         $env->safeLoad();
-        self::$api = new BlaguesApi($_ENV['BLAGUES_API_TOKEN']);
 
         parent::setUpBeforeClass();
     }
 
     public function testRandomJoke(): void
     {
-        $joke = self::$api->getRandom();
+        $joke = $this->getApiMock()->getRandom();
 
         $this->assertInstanceOf(Joke::class, $joke);
         $this->assertIsInt($joke->getId());
@@ -35,8 +36,9 @@ class BlaguesApiTest extends TestCase
 
     public function testJokeById(): void
     {
-        $joke = self::$api->getById(1432);
+        $joke = $this->getApiMock()->getById(1432);
 
+        $this->assertNotNull($joke);
         $this->assertInstanceOf(Joke::class, $joke);
         $this->assertSame(1432, $joke->getId());
         $this->assertSame(Joke::TYPE_DIRTY, $joke->getType());
@@ -46,8 +48,8 @@ class BlaguesApiTest extends TestCase
 
     public function testJokeTypes(): void
     {
-        foreach(Joke::TYPES as $type) {
-            $joke = self::$api->getByType($type);
+        foreach (Joke::TYPES as $type) {
+            $joke = $this->getApiMock()->getByType($type);
 
             $this->assertInstanceOf(Joke::class, $joke);
             $this->assertSame($type, $joke->getType());
@@ -78,5 +80,61 @@ class BlaguesApiTest extends TestCase
         ];
 
         $this->assertInstanceOf(Joke::class, Joke::createFromJson($joke));
+    }
+
+    public function testApiFactory(): void
+    {
+        $api = BlaguesApiFactory::create('coincoin');
+
+        $this->assertInstanceOf(BlaguesApiInterface::class, $api);
+        $this->assertInstanceOf(BlaguesApi::class, $api);
+    }
+
+    /**
+     * @return array<string, mixed>[]
+     */
+    private static function getJokesMocks(): array
+    {
+        return [
+            'getRandom' => [
+                'id' => 1,
+                'joke' => 'coincoin',
+                'answer' => 'pouet',
+                'type' => Joke::TYPE_DEV,
+            ],
+            'getById' => [
+                'id' => 1432,
+                'type' => Joke::TYPE_DIRTY,
+                'joke' => 'Comment appelle-t-on une douche qui n\'a pas d\'eau ?',
+                'answer' => 'Une duche',
+            ],
+            'getByType' => fn (string $type) => new Joke(1, $type, 'coincoin', 'pouet'),
+        ];
+    }
+
+    private function getApiMock(): BlaguesApi
+    {
+        $api = $this->createMock(BlaguesApi::class);
+
+        foreach (self::getJokesMocks() as $methodName => $returnValue) {
+            $method = $api->method($methodName);
+
+            if (is_callable($returnValue)) {
+                $method->willReturnCallback($returnValue);
+            } elseif (is_array($returnValue)) {
+                try {
+                    /** @phpstan-ignore-next-line */
+                    $joke = Joke::createFromJson($returnValue);
+
+                    $method->willReturn($joke);
+                } catch (JokeException $e) {
+                    $method->willReturn($returnValue);
+                }
+            } else {
+                $method->willReturn($returnValue);
+            }
+        }
+
+        return $api;
     }
 }
