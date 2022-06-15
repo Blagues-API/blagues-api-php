@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Blagues\Models;
 
 use Blagues\Exceptions\InvalidJokeDataException;
+use JsonSerializable;
 
-class Joke
+class Joke implements JsonSerializable
 {
     public const TYPE_GLOBAL = 'global';
     public const TYPE_DEV    = 'dev';
@@ -66,15 +69,30 @@ class Joke
     public static function createFromJson($json): Joke
     {
         $data = is_string($json) ? json_decode($json, true) : $json;
+
+        if (!is_array($data)) {
+            throw new InvalidJokeDataException([]);
+        }
+
         if (
             !array_key_exists('id', $data) ||
             !array_key_exists('type', $data) ||
             !array_key_exists('joke', $data) ||
             !array_key_exists('answer', $data)
         ) {
-            throw new InvalidJokeDataException('Invalid joke data ! Make sure the following json object is correct: ' . json_encode($data));
+            throw new InvalidJokeDataException($data);
         }
 
-        return new Joke($data['id'], $data['type'], $data['joke'], $data['answer']);
+        return new self($data['id'], $data['type'], $data['joke'], $data['answer']);
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'type' => $this->type,
+            'joke' => $this->joke,
+            'answer' => $this->answer,
+        ];
     }
 }
