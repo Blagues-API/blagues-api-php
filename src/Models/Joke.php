@@ -86,6 +86,9 @@ class Joke implements JsonSerializable
         return new self($data['id'], $data['type'], $data['joke'], $data['answer']);
     }
 
+    /**
+     * @return array<string, string|int>
+     */
     public function jsonSerialize(): array
     {
         return [
