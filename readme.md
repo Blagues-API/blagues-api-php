@@ -81,4 +81,4 @@ class JokeController extends AbstractController
 ```
 
 ## Contributing
-Check the (contributing.md)[./contributing.md] file before making any contribution to the project.
+Check the [contributing.md](./contributing.md) file before making any contribution to the project.
