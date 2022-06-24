@@ -1,16 +1,17 @@
-If you want to contribute to this project, check and claim an open issue (or open a new one), and fork + clone the project.  
-You will then be able to create your feature, but make sure you follow these steps before:
+Si vous voulez contribuer au projet, n'hésitez pas à jeter un oeil aux [issues ouvertes](https://github.com/Blagues-API/blagues-api-php/issues) et a vous en attribuer une. Il faudra ensuite forker + cloner le repo en local et installer les dépendances composer.
+
+Voici le workflow que vous devez suivre si vous voulez que votre feature soit acceptée.
 
 ## 1 - Tests
-After installing all the dependencies using composer, make sure all your tests are passing, before and after completing your feature:
+Après avoir setup le projet localement et installé toutes les dépendances, assurez vous que les tests phpunit passent correctement **avant** et **après** vos ajouts:
 ```shell
 cp ./phpunit.xml.dist ./phpunit.xml
 php ./vendor/bin/phpunit -c ./phpunit.xml
 ```
-When you are done coding your feature, make sure to create new tests to ensure everything works properly.
+Une fois votre feature terminée, assurez vous de créer des tests supplémentaires et qu'ils passent tous correctement.
 
 ## 2 - Linters
-This project uses both Phpstan and Phpcs, make sure both are passing before and after your new feature:
+Ce projet utilise PHP Stan et PHP CS, assurez vous que les 2 passent correctement **avant** et **après** vos ajouts:
 ```shell
 # phpstan
 cp ./phpstan.neon.dist ./phpstan.neon
