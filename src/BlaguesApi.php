@@ -6,6 +6,7 @@ namespace Blagues;
 
 use Blagues\Exceptions\ApiUnavailableException;
 use Blagues\Exceptions\InvalidJokeTypeException;
+use Blagues\Exceptions\InvalidResponseShapeException;
 use Blagues\Exceptions\InvalidTokenException;
 use Blagues\Exceptions\JokeException;
 use Blagues\Models\Joke;
@@ -55,15 +56,15 @@ class BlaguesApi implements BlaguesApiInterface
         }
 
         $json = (string) $res->getBody();
-        $joke = json_decode($json, true);
+        $data = json_decode($json, true);
 
-        if (!is_array($joke)) {
+        if (!is_array($data)) {
             throw new JokeException(
                 'Invalid server response! Please report this is a new issue on this package\'s git repository.'
             );
         }
 
-        return $joke;
+        return $data;
     }
 
     /**
@@ -116,6 +117,20 @@ class BlaguesApi implements BlaguesApiInterface
         }
 
         return null;
+    }
+
+    /**
+     * @throws JokeException|GuzzleException
+     */
+    public function count(): int
+    {
+        $res = $this->request('/api/count');
+
+        if (!$res['count']) {
+            throw new InvalidResponseShapeException($res);
+        }
+
+        return (int) $res['count'];
     }
 
     /**

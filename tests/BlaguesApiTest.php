@@ -46,6 +46,13 @@ class BlaguesApiTest extends TestCase
         $this->assertSame('Une duche', $joke->getAnswer());
     }
 
+    public function testCount(): void
+    {
+        $count = $this->getApiMock()->count();
+
+        $this->assertGreaterThan(0, $count);
+    }
+
     public function testJokeTypes(): void
     {
         foreach (Joke::TYPES as $type) {
@@ -109,6 +116,7 @@ class BlaguesApiTest extends TestCase
                 'answer' => 'Une duche',
             ],
             'getByType' => fn (string $type) => new Joke(1, $type, 'coincoin', 'pouet'),
+            'count' => 1700,
         ];
     }
 
