@@ -86,6 +86,7 @@ Exemple Symfony avec injection de dépendance + factory
 services:
   Blagues\BlaguesApi:
     factory: ['@Blagues\BlaguesApiFactory', create]
+    arguments: ['%env(BLAGUES_API_TOKEN)%']
 ```
 ```php
 <?php
