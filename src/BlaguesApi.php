@@ -48,7 +48,7 @@ class BlaguesApi implements BlaguesApiInterface
             if ($statusCode === 404) {
                 return [];
             }
-            if ($statusCode > 500) {
+            if ($statusCode >= 500) {
                 throw new ApiUnavailableException($e);
             }
 
@@ -60,7 +60,7 @@ class BlaguesApi implements BlaguesApiInterface
 
         if (!is_array($data)) {
             throw new JokeException(
-                'Invalid server response! Please report this is a new issue on this package\'s git repository.'
+                'Invalid server response! Please report this in a new issue on this package\'s git repository (https://github.com/Blagues-API/blagues-api-php/issues/new).'
             );
         }
 
