@@ -60,7 +60,8 @@ class BlaguesApi implements BlaguesApiInterface
 
         if (!is_array($data)) {
             throw new JokeException(
-                'Invalid server response! Please report this in a new issue on this package\'s git repository (https://github.com/Blagues-API/blagues-api-php/issues/new).'
+                'Invalid server response! Please report this in a new issue' .
+                'on this package\'s git repository (https://github.com/Blagues-API/blagues-api-php/issues/new).'
             );
         }
 
@@ -68,7 +69,7 @@ class BlaguesApi implements BlaguesApiInterface
     }
 
     /**
-     * @phpstan-param value-of<Joke::TYPES>[] $disallowed
+     * {@inheritdoc}
      *
      * @throws JokeException|GuzzleException
      */
@@ -76,7 +77,7 @@ class BlaguesApi implements BlaguesApiInterface
     {
         $query = '';
         if (!empty($disallowed)) {
-            if (count($disallowed) === count(Joke::TYPES)) {
+            if (count($disallowed) === count(JokeTypeInterface::TYPES)) {
                 throw new InvalidJokeTypeException('You cannot disable all joke types !');
             }
 
@@ -93,7 +94,7 @@ class BlaguesApi implements BlaguesApiInterface
     }
 
     /**
-     * @phpstan-param value-of<Joke::TYPES> $type
+     * {@inheritdoc}
      *
      * @throws JokeException|GuzzleException
      */
@@ -107,6 +108,8 @@ class BlaguesApi implements BlaguesApiInterface
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @throws JokeException|GuzzleException
      */
     public function getById(int $id): ?Joke
@@ -120,6 +123,8 @@ class BlaguesApi implements BlaguesApiInterface
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @throws JokeException|GuzzleException
      */
     public function count(): int
@@ -138,8 +143,13 @@ class BlaguesApi implements BlaguesApiInterface
      */
     private function validateType(string $type): void
     {
-        if (!in_array($type, Joke::TYPES)) {
-            $message = sprintf('Joke type "%s" does not exist! Make sure to use one of the following types: %s', $type, implode(', ', Joke::TYPES));
+        if (!in_array($type, JokeTypeInterface::TYPES)) {
+            $message = sprintf(
+                'Joke type "%s" does not exist!' .
+                'Make sure to use one of the following types: "%s"',
+                $type,
+                implode(', ', JokeTypeInterface::TYPES)
+            );
 
             throw new InvalidJokeTypeException($message);
         }
