@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Blagues;
 
-class BlaguesApiFactory
+class BlaguesApiFactory implements BlaguesApiFactoryInterface
 {
-    public static function create(string $authToken): BlaguesApiInterface
+    public static function create(string $authToken = ''): BlaguesApiInterface
     {
         return new BlaguesApi($authToken);
     }

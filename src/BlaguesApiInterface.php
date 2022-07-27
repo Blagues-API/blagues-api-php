@@ -6,19 +6,30 @@ namespace Blagues;
 
 use Blagues\Models\Joke;
 
-interface BlaguesApiInterface
+interface BlaguesApiInterface extends JokeTypeInterface
 {
-    public function __construct(string $authToken);
-
     /**
-     * @phpstan-param value-of<Joke::TYPES>[] $disallowed
+     * Get a random joke.
+     *
+     * @phpstan-param value-of<JokeTypeInterface::TYPES>[] $disallowed
+     *                The joke types that are not allowed to be returned.
      */
     public function getRandom(array $disallowed = []): Joke;
 
     /**
-     * @phpstan-param value-of<Joke::TYPES> $type
+     * Get a random joke by its type.
+     *
+     * @phpstan-param value-of<JokeTypeInterface::TYPES> $type
      */
     public function getByType(string $type): Joke;
 
+    /**
+     * Finds a joke by its id.
+     */
     public function getById(int $id): ?Joke;
+
+    /**
+     * Returns the total count of jokes.
+     */
+    public function count(): int;
 }
