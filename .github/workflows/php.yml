@@ -1,4 +1,4 @@
-name: PHP Composer
+name: Tests & linters
 
 on:
   push:
@@ -33,10 +33,13 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Run tests
-      run: ./vendor/bin/phpunit -c ./phpunit.xml.dist
+      run: ./vendor/bin/phpunit -c ./phpunit.dist.xml
 
-    - name: Lint w/ phpcs
-      run: ./vendor/bin/phpcs --standard=phpcs.xml.dist
+    - name: Lint w/ phpcs fixer
+      run: ./tools/vendor/bin/php-cs-fixer --dry-run
 
     - name: Lint w/ phpstan
-      run: ./vendor/bin/phpstan analyze -c ./phpstan.neon.dist
+      run: ./vendor/bin/phpstan analyze -c ./phpstan.dist.neon
+
+    - name: Lint w/ psalm
+      run: ./vendor/bin/psalm.phar

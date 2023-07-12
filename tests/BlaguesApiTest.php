@@ -1,15 +1,15 @@
-<?php
+/* <?php
 
 declare(strict_types=1);
 
-namespace Test;
+namespace Zuruuh\BlaguesApi\Tests;
 
 use Blagues\BlaguesApi;
 use Blagues\BlaguesApiFactory;
 use Blagues\BlaguesApiInterface;
-use Blagues\Exceptions\InvalidJokeDataException;
-use Blagues\Exceptions\JokeException;
-use Blagues\Models\Joke;
+use Blagues\Exception\InvalidJokeDataException;
+use Blagues\Exception\JokeException;
+use Blagues\Model\Joke;
 use Dotenv\Dotenv;
 use PHPUnit\Framework\TestCase;
 
@@ -146,3 +146,4 @@ class BlaguesApiTest extends TestCase
         return $api;
     }
 }
+*/

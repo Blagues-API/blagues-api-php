@@ -13,29 +13,27 @@ Vous pouvez récupérer votre token d'authentification sur le site officiel http
 ```php
 <?php
 
-use Blagues\BlaguesApi;
+declare(strict_types=1);
 
-class Main
-{
-    public static main(): void
-    {
-        $blaguesApi = new BlaguesApi($_ENV['TOKEN']);
+use Zuruuh\BlaguesApi\BlaguesApiFactory;
 
-        $joke = $blaguesApi->getRandom(); // Renvoies une instance de la classe Blagues\Models\Joke
+$blaguesApi = BlaguesApiFactory::create($_ENV['TOKEN']);
 
-        var_dump($joke->getJoke()); // Renvoie le contenu de la blague.
-        var_dump($joke->getAnswer()); // Renvoie la réponse à la blague si il y en a une.
-    }
-}
+$joke = $blaguesApi->getRandom(); // Renvoies une instance de la classe Blagues\Model\Joke
+
+var_dump($joke->getJoke()); // Renvoie le contenu de la blague.
+var_dump($joke->getAnswer()); // Renvoie la réponse à la blague si il y en a une.
 ```
 
 ```php
 <?php
 
-use Blagues\Models\Joke;
-use Blagues\BlaguesApi;
+declare(strict_types=1);
 
-$blaguesApi = new BlaguesApi($_ENV['TOKEN']);
+use Zuruuh\BlaguesApi\Model\Joke;
+use Zuruuh\BlaguesApi\BlaguesApiFactory;
+
+$blaguesApi = BlaguesApiFactory::create($_ENV['TOKEN']);
 
 $joke = $blaguesApi->getById(1234);
 var_dump($joke->getId()); // renvoies 1234
@@ -49,32 +47,27 @@ Exemple avec Symfony
 ```php
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Blagues\BlaguesApi;
+use Zuruuh\BlaguesApi\BlaguesApiFactory;
 
 class JokeController extends AbstractController
 {
-    private ParameterBagInterface $parametersBag;
-
-    public function __construct(ParameterBagInterface $parametersBag)
-    {
-        $this->parametersBag = $parametersBag;
-    }
-
     #[Route('/joke')]
-    public function jokeAction(): Response
+    public function jokeAction(#[Autowire('%env(BLAGUES_API_TOKEN)%')] string $blaguesApiToken): Response
     {
-        $blaguesApi = new BlaguesApi($this->parametersBag->get('BLAGUES_API_TOKEN'));
+        $blaguesApi = BlaguesApiFactory::create($blaguesApiToken);
 
         $joke = $blaguesApi->getRandom();
 
         return $this->render('template/joke.html.twig', [
-            "joke" => $joke,
+            'joke' => $joke,
         ]);
     }
 }
@@ -84,31 +77,32 @@ Exemple Symfony avec injection de dépendance + factory
 ```yaml
 # config/services.yaml
 services:
-  Blagues\BlaguesApi:
-    factory: ['@Blagues\BlaguesApiFactory', create]
+  Zuruuh\BlaguesApi\BlaguesApiInterface:
+    factory: ['Zuruuh\BlaguesApi\BlaguesApiFactory', create]
     arguments: ['%env(BLAGUES_API_TOKEN)%']
 ```
 ```php
 <?php
 // src/Controller/JokeController
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
+use Blagues\BlaguesApi;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Blagues\BlaguesApi;
 
 class JokeController extends AbstractController
 {
     #[Route('/joke')]
-    public function jokeAction(BlaguesApi $blaguesApi): Response
+    public function jokeAction(BlaguesApiInterface $blaguesApi): Response
     {
         $joke = $blaguesApi->getRandom();
 
         return $this->render('template/joke.html.twig', [
-            "joke" => $joke,
+            'joke' => $joke,
         ]);
     }
 }

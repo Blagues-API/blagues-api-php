@@ -7,9 +7,11 @@ namespace Zuruuh\BlaguesApi\Http;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Zuruuh\BlaguesApi\Exception\InvalidTokenException;
 
 /**
  * @internal
+ * @immutable
  */
 final class HttpClient implements ClientInterface
 {
@@ -17,7 +19,7 @@ final class HttpClient implements ClientInterface
 
     /**
      * @param non-empty-string $authToken
-     */ 
+     */
     public function __construct(
         private ClientInterface $httpClient,
         private string $authToken
@@ -30,6 +32,12 @@ final class HttpClient implements ClientInterface
             ->withUri($request->getUri()->withHost(self::API_DOMAIN))
         ;
 
-        return $this->httpClient->sendRequest($request);
+        $response = $this->httpClient->sendRequest($request);
+
+        if ($response->getStatusCode() === 401) {
+            throw new InvalidTokenException();
+        }
+
+        return $response;
     }
 }

@@ -22,5 +22,8 @@ final class JokeTypes
         self::TYPE_BLONDS,
     ];
 
+    /**
+     * @api
+     */
     private function __construct() {}
 }

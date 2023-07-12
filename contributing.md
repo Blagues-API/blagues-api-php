@@ -4,7 +4,7 @@ Voici le workflow que vous devez suivre si vous voulez que votre feature soit ac
 
 ## 1 - Tests
 Après avoir setup le projet localement et installé toutes les dépendances, assurez vous que les tests phpunit passent correctement **avant** et **après** vos ajouts:
-```shell
+```bash
 cp ./phpunit.xml.dist ./phpunit.xml
 php ./vendor/bin/phpunit -c ./phpunit.xml
 ```
@@ -12,12 +12,9 @@ Une fois votre feature terminée, assurez vous de créer des tests supplémentai
 
 ## 2 - Linters
 Ce projet utilise PHP Stan et PHP CS, assurez vous que les 2 passent correctement **avant** et **après** vos ajouts:
-```shell
+```bash
 # phpstan
-cp ./phpstan.neon.dist ./phpstan.neon
-php ./vendor/bin/phpstan analyze -c ./phpstan.neon
+php ./tools/vendor/bin/phpstan analyze -c ./tools/phpstan.dist.neon
 
-# phpcs
-cp ./phpcs.xml.dist ./phpcs.xml
-php ./vendor/bin/phpcs --standard=phpcs.xml
+# phpcs fixer
 ```
