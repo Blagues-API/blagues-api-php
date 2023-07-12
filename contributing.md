@@ -10,5 +10,5 @@ composer install --working-dir=tools
 
 php ./tools/vendor/bin/phpstan analyze -c ./tools/phpstan.dist.neon
 php ./tools/vendor/bin/psalm -c ./tools/psalm.dist.xml
-php ./tools/vendor/bin/php-cs-fixer fix
+php ./tools/vendor/bin/php-cs-fixer fix --config ./tools/.php-cs-fixer.dist.php
 ```
