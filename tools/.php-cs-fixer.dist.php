@@ -16,6 +16,8 @@ $config = (new \PhpCsFixer\Config())
         '@PSR2' => true,
         '@PSR12' => true,
         '@PSR12:risky' => true,
+        '@PHP80Migration' => true,
+        '@PHP80Migration:risky' => true,
         'single_line_empty_body' => true,
     ])
     ->setFinder($finder)

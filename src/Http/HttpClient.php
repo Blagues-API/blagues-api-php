@@ -15,7 +15,7 @@ use Zuruuh\BlaguesApi\Exception\InvalidTokenException;
  */
 final class HttpClient implements ClientInterface
 {
-    private const API_DOMAIN = 'https://www.blagues-api.fr/';
+    private const API_DOMAIN = 'www.blagues-api.fr';
 
     /**
      * @param non-empty-string $authToken
@@ -29,7 +29,7 @@ final class HttpClient implements ClientInterface
     {
         $request = $request
             ->withHeader('Authorization', "Bearer {$this->authToken}")
-            ->withUri($request->getUri()->withHost(self::API_DOMAIN))
+            ->withUri($request->getUri()->withHost(self::API_DOMAIN)->withScheme('https'))
         ;
 
         $response = $this->httpClient->sendRequest($request);

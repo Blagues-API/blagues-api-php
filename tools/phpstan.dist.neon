@@ -7,4 +7,3 @@ parameters:
         - ../vendor
     paths:
         - ../src
-       # - tests

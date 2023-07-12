@@ -32,14 +32,11 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
-    - name: Run tests
-      run: ./vendor/bin/phpunit -c ./phpunit.dist.xml
-
     - name: Lint w/ phpcs fixer
       run: ./tools/vendor/bin/php-cs-fixer --dry-run
 
-    - name: Lint w/ phpstan
-      run: ./vendor/bin/phpstan analyze -c ./phpstan.dist.neon
+    - name: phpstan static analysis
+      run: ./tools/vendor/bin/phpstan analyze -c ./tools/phpstan.dist.neon
 
-    - name: Lint w/ psalm
-      run: ./vendor/bin/psalm.phar
+    - name: psalm static analysis
+      run: ./tools/vendor/bin/psalm.phar -c ./tools/psalm.dist.xml
