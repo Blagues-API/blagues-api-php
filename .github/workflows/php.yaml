@@ -42,7 +42,7 @@ jobs:
       run: ./tools/vendor/bin/php-cs-fixer fix --dry-run --config ./tools/.php-cs-fixer.dist.php
 
     - name: phpstan static analysis
-      run: ./tools/vendor/bin/phpstan analyze -c ./tools/phpstan.dist.neon
+      run: ./tools/vendor/bin/phpstan analyze -c ./tools/phpstan.dist.neon --no-progress
 
     - name: psalm static analysis
       run: ./tools/vendor/bin/psalm.phar -c ./tools/psalm.dist.xml
