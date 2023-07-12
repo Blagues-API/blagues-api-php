@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Blagues;
+namespace Zuruuh\BlaguesApi;
 
-interface JokeTypeInterface
+final class JokeTypes
 {
     public const TYPE_GLOBAL = 'global';
     public const TYPE_DEV    = 'dev';
@@ -21,4 +21,6 @@ interface JokeTypeInterface
         self::TYPE_DIRTY,
         self::TYPE_BLONDS,
     ];
+
+    private function __construct() {}
 }

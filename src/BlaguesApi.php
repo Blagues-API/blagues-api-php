@@ -10,31 +10,46 @@ use Blagues\Exceptions\InvalidResponseShapeException;
 use Blagues\Exceptions\InvalidTokenException;
 use Blagues\Exceptions\JokeException;
 use Blagues\Models\Joke;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\RequestOptions;
+use Http\Discovery\Psr17Factory;
+use Http\Discovery\Psr17FactoryDiscovery;
+use Http\Discovery\Psr18ClientDiscovery;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
+use Zuruuh\BlaguesApi\Http\HttpClient;
 
 class BlaguesApi implements BlaguesApiInterface
 {
-    private Client $httpClient;
+    private HttpClient $httpClient;
+    private RequestFactoryInterface $requestFactory;
+    private UriFactoryInterface $uriFactory;
+    private SerializerInterface $serializer;
 
-    public function __construct(string $authToken)
-    {
-        $this->httpClient = new Client([
-            'base_uri' => 'https://www.blagues-api.fr/',
-            'timeout' => 10,
-            RequestOptions::HEADERS => [
-                'Authorization' => 'Bearer ' . $authToken
-            ]
-        ]);
+    /**
+     * @param non-empty-string $authToken
+     */ 
+    public function __construct(
+        string $authToken,
+        ?ClientInterface $httpClient = null,
+        ?RequestFactoryInterface $requestFactory = null,
+        ?UriFactoryInterface $uriFactory = null,
+        ?SerializerInterface $serializer = null,
+    ) {
+        $httpClient ??= Psr18ClientDiscovery::find();
+        $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
+        $this->uriFactory = $uriFactory ?? Psr17FactoryDiscovery::findUriFactory();
+        $this->httpClient = new HttpClient($httpClient, $authToken);
+        $this->serializer = $serializer ?? new Serializer([new ObjectNormalizer()], [new JsonEncoder()]);
     }
 
     /**
      * @throws JokeException|GuzzleException
      *
      * @phpstan-return array<string, int|string>
-     */
     private function request(string $uri): array
     {
         try {
@@ -67,11 +82,10 @@ class BlaguesApi implements BlaguesApiInterface
 
         return $data;
     }
+     */
 
     /**
      * {@inheritdoc}
-     *
-     * @throws JokeException|GuzzleException
      */
     public function getRandom(array $disallowed = []): Joke
     {
@@ -89,6 +103,7 @@ class BlaguesApi implements BlaguesApiInterface
         }
 
         $joke = $this->request('/api/random?disallow=' . $query);
+        /* $this->httpClient->sendRequest($this->requestFactory->createRequest('GET', $this->uriFactory->createUri('/api/random'))) */
 
         return Joke::createFromJson($joke);
     }
