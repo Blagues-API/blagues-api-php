@@ -15,7 +15,7 @@ Vous pouvez récupérer votre token d'authentification sur le site officiel http
 
 declare(strict_types=1);
 
-use Zuruuh\BlaguesApi\BlaguesApiFactory;
+use Zuruuh\BlaguesApi\Factory\BlaguesApiFactory;
 
 $blaguesApi = BlaguesApiFactory::create($_ENV['TOKEN']);
 
@@ -31,16 +31,16 @@ var_dump($joke->getAnswer()); // Renvoie la réponse à la blague si il y en a u
 declare(strict_types=1);
 
 use Zuruuh\BlaguesApi\Model\Joke;
-use Zuruuh\BlaguesApi\BlaguesApiFactory;
+use Zuruuh\BlaguesApi\Factory\BlaguesApiFactory;
 
 $blaguesApi = BlaguesApiFactory::create($_ENV['TOKEN']);
 
 $joke = $blaguesApi->getById(1234);
-var_dump($joke->getId()); // renvoies 1234
+dump($joke->getId()); // renvoies 1234
 
-$joke = $blaguesApi->getRandom([Joke::TYPE_DARK]); // Cette méthode va récupérer une blague aléatoire de n'importe quel type excepté Joke::TYPE_DARK.
+$joke = $blaguesApi->getRandom([Joke::TYPE_DARK]); // Récuperes une blague aléatoire de n'importe quel type excepté `Joke::TYPE_DARK`.
 
-$joke = $blaguesApi->getByType(Joke::TYPE_DEV); // Cette méthode va récupérer une blague aléatoire de type Joke::TYPE_DEV.
+$joke = $blaguesApi->getByType(Joke::TYPE_DEV); // Récuperes une blague aléatoire de type `Joke::TYPE_DEV`.
 ```
 
 Exemple avec Symfony
@@ -52,10 +52,9 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Zuruuh\BlaguesApi\BlaguesApiFactory;
+use Zuruuh\BlaguesApi\Factory\BlaguesApiFactory;
 
 class JokeController extends AbstractController
 {
@@ -89,10 +88,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use Blagues\BlaguesApi;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Zuruuh\BlaguesApi\BlaguesApiInterface;
 
 class JokeController extends AbstractController
 {

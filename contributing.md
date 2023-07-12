@@ -5,6 +5,9 @@ Voici le workflow que vous devez suivre si vous voulez que votre feature soit ac
 ## 2 - Linters
 Ce projet utilise phpstan, psalm, et php cs fixer, assurez vous que les 3 outils fonctionnent correctement **avant** et **après** vos ajouts:
 ```bash
+composer install
+composer install --working-dir=tools
+
 php ./tools/vendor/bin/phpstan analyze -c ./tools/phpstan.dist.neon
 php ./tools/vendor/bin/psalm -c ./tools/psalm.dist.xml
 php ./tools/vendor/bin/php-cs-fixer fix
