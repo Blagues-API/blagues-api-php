@@ -2,140 +2,140 @@
 
 declare(strict_types=1);
 
-namespace Blagues;
+namespace Zuruuh\BlaguesApi;
 
-use Blagues\Exceptions\ApiUnavailableException;
-use Blagues\Exceptions\InvalidJokeTypeException;
-use Blagues\Exceptions\InvalidResponseShapeException;
-use Blagues\Exceptions\InvalidTokenException;
-use Blagues\Exceptions\JokeException;
-use Blagues\Models\Joke;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\RequestOptions;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+use Zuruuh\BlaguesApi\Exception\InvalidJokeTypeException;
+use Zuruuh\BlaguesApi\Exception\JokeException;
+use Zuruuh\BlaguesApi\Http\HttpClient;
+use Zuruuh\BlaguesApi\JokeTypes;
+use Zuruuh\BlaguesApi\Model\Joke;
+use Zuruuh\BlaguesApi\Model\JokeCount;
 
-class BlaguesApi implements BlaguesApiInterface
+/**
+ * @immutable
+ * @api
+ */
+final class BlaguesApi implements BlaguesApiInterface
 {
-    private Client $httpClient;
-
-    public function __construct(string $authToken)
-    {
-        $this->httpClient = new Client([
-            'base_uri' => 'https://www.blagues-api.fr/',
-            'timeout' => 10,
-            RequestOptions::HEADERS => [
-                'Authorization' => 'Bearer ' . $authToken
-            ]
-        ]);
-    }
+    private HttpClient $httpClient;
 
     /**
-     * @throws JokeException|GuzzleException
-     *
-     * @phpstan-return array<string, int|string>
+     * @param non-empty-string $authToken
      */
-    private function request(string $uri): array
-    {
-        try {
-            $res = $this->httpClient->get($uri);
-        } catch (ClientException $e) {
-            $statusCode = $e->getResponse()->getStatusCode();
-
-            if ($statusCode === 401) {
-                throw new InvalidTokenException($e);
-            }
-            if ($statusCode === 404) {
-                return [];
-            }
-            if ($statusCode >= 500) {
-                throw new ApiUnavailableException($e);
-            }
-
-            throw $e;
-        }
-
-        $json = (string) $res->getBody();
-        $data = json_decode($json, true);
-
-        if (!is_array($data)) {
-            throw new JokeException(
-                'Invalid server response! Please report this in a new issue' .
-                'on this package\'s git repository (https://github.com/Blagues-API/blagues-api-php/issues/new).'
-            );
-        }
-
-        return $data;
+    public function __construct(
+        string $authToken,
+        ClientInterface $httpClient,
+        private RequestFactoryInterface $requestFactory,
+        private UriFactoryInterface $uriFactory,
+        private SerializerInterface $serializer
+    ) {
+        $this->httpClient = new HttpClient($httpClient, $authToken);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @throws JokeException|GuzzleException
      */
     public function getRandom(array $disallowed = []): Joke
     {
-        $query = '';
-        if (!empty($disallowed)) {
-            if (count($disallowed) === count(JokeTypeInterface::TYPES)) {
-                throw new InvalidJokeTypeException('You cannot disable all joke types !');
-            }
-
-            foreach ($disallowed as $type) {
-                $this->validateType($type);
-            }
-
-            $query = implode('&disallow=', $disallowed);
+        if (count($disallowed) === count(JokeTypes::TYPES)) {
+            throw new InvalidJokeTypeException('You cannot disable all joke types !');
         }
 
-        $joke = $this->request('/api/random?disallow=' . $query);
+        foreach ($disallowed as $type) {
+            $this->validateType($type);
+        }
 
-        return Joke::createFromJson($joke);
+        /* $joke = $this->request('/api/random?disallow=' . $query); */
+        $query = '';
+        foreach ($disallowed as $type) {
+            $query .= "disallow=$type&";
+        }
+
+        $request = $this
+            ->requestFactory
+            ->createRequest(
+                'GET',
+                $this->uriFactory->createUri('/api/random')->withQuery($query)
+            );
+
+        $responseContent = $this->httpClient->sendRequest($request)->getBody()->getContents();
+
+        return $this->deserializeJokeFromJsonContent($responseContent);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @throws JokeException|GuzzleException
      */
     public function getByType(string $type): Joke
     {
         $this->validateType($type);
 
-        $joke = $this->request(sprintf('/api/type/%s/random', $type));
+        $request = $this
+            ->requestFactory
+            ->createRequest(
+                'GET',
+                $this->uriFactory->createUri("/api/type/$type/random")
+            );
 
-        return Joke::createFromJson($joke);
+        $responseContent = $this->httpClient->sendRequest($request)->getBody()->getContents();
+
+        return $this->deserializeJokeFromJsonContent($responseContent);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @throws JokeException|GuzzleException
      */
     public function getById(int $id): ?Joke
     {
-        $joke = $this->request(sprintf('/api/id/%d', $id));
-        if ($joke) {
-            return Joke::createFromJson($joke);
+        $request = $this
+            ->requestFactory
+            ->createRequest(
+                'GET',
+                $this->uriFactory->createUri("/api/id/$id")
+            );
+
+        $response = $this->httpClient->sendRequest($request);
+
+        if ($response->getStatusCode() === 404) {
+            return null;
         }
 
-        return null;
+        return $this->deserializeJokeFromJsonContent($response->getBody()->getContents());
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @throws JokeException|GuzzleException
      */
     public function count(): int
     {
-        $res = $this->request('/api/count');
+        $request = $this
+            ->requestFactory
+            ->createRequest(
+                'GET',
+                $this->uriFactory->createUri("/api/count")
+            );
 
-        if (!$res['count']) {
-            throw new InvalidResponseShapeException($res);
+        $responseContent = $this->httpClient->sendRequest($request)->getBody()->getContents();
+
+        try {
+            return $this->serializer->deserialize(
+                $responseContent,
+                JokeCount::class,
+                'json'
+            )->getCount();
+        } catch (PartialDenormalizationException $exception) {
+            throw new JokeException(
+                'An error has occured while creating the joke count object! ' .
+                    'This might be related to the serializer implementation you used',
+                previous: $exception
+            );
         }
-
-        return (int) $res['count'];
     }
 
     /**
@@ -143,15 +143,37 @@ class BlaguesApi implements BlaguesApiInterface
      */
     private function validateType(string $type): void
     {
-        if (!in_array($type, JokeTypeInterface::TYPES)) {
+        if (!in_array($type, JokeTypes::TYPES, true)) {
             $message = sprintf(
                 'Joke type "%s" does not exist!' .
                 'Make sure to use one of the following types: "%s"',
                 $type,
-                implode(', ', JokeTypeInterface::TYPES)
+                implode(', ', JokeTypes::TYPES)
             );
 
             throw new InvalidJokeTypeException($message);
         }
+    }
+
+    /**
+     * @throws JokeException
+     */
+    private function deserializeJokeFromJsonContent(string $content): Joke
+    {
+        try {
+            return $this->serializer->deserialize(
+                $content,
+                Joke::class,
+                'json',
+                [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true]
+            );
+        } catch (PartialDenormalizationException $exception) {
+            throw new JokeException(
+                'An error has occured while creating the joke object! ' .
+                    'This might be related to the serializer implementation you used',
+                previous: $exception
+            );
+        }
+
     }
 }

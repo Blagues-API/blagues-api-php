@@ -1,7 +1,7 @@
 /vendor
-/.env
-/.phpunit.result.cache
+/.env.local
 
-/phpstan.neon
+/composer.lock
+
+/.phpunit.result.cache
 /phpunit.xml
-/phpcs.xml

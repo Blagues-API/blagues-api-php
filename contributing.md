@@ -2,22 +2,13 @@ Si vous voulez contribuer au projet, n'hésitez pas à jeter un oeil aux [issues
 
 Voici le workflow que vous devez suivre si vous voulez que votre feature soit acceptée.
 
-## 1 - Tests
-Après avoir setup le projet localement et installé toutes les dépendances, assurez vous que les tests phpunit passent correctement **avant** et **après** vos ajouts:
-```shell
-cp ./phpunit.xml.dist ./phpunit.xml
-php ./vendor/bin/phpunit -c ./phpunit.xml
-```
-Une fois votre feature terminée, assurez vous de créer des tests supplémentaires et qu'ils passent tous correctement.
-
 ## 2 - Linters
-Ce projet utilise PHP Stan et PHP CS, assurez vous que les 2 passent correctement **avant** et **après** vos ajouts:
-```shell
-# phpstan
-cp ./phpstan.neon.dist ./phpstan.neon
-php ./vendor/bin/phpstan analyze -c ./phpstan.neon
+Ce projet utilise phpstan, psalm, et php cs fixer, assurez vous que les 3 outils fonctionnent correctement **avant** et **après** vos ajouts:
+```bash
+composer install
+composer install --working-dir=tools
 
-# phpcs
-cp ./phpcs.xml.dist ./phpcs.xml
-php ./vendor/bin/phpcs --standard=phpcs.xml
+php ./tools/vendor/bin/phpstan analyze -c ./tools/phpstan.dist.neon
+php ./tools/vendor/bin/psalm -c ./tools/psalm.dist.xml
+php ./tools/vendor/bin/php-cs-fixer fix --config ./tools/.php-cs-fixer.dist.php
 ```
