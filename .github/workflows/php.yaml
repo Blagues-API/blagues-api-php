@@ -24,8 +24,19 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-php-
 
+    - name: Cache Composer packages in tools dir
+      id: composer-tools-cache
+      uses: actions/cache@v3
+      with:
+        path: tools/vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}-tools
+        restore-keys: |
+          ${{ runner.os }}-php-
+
     - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
+      run: |
+        composer install --prefer-dist --no-progress
+        composer install --prefer-dist --no-progress --working-dir=tools
 
     - name: Lint w/ phpcs fixer
       run: ./tools/vendor/bin/php-cs-fixer --dry-run
