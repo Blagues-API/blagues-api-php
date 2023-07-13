@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Zuruuh\BlaguesApi;
+namespace BlaguesApi;
 
-use Zuruuh\BlaguesApi\Exception\JokeException;
-use Zuruuh\BlaguesApi\JokeTypes;
-use Zuruuh\BlaguesApi\Model\Joke;
+use BlaguesApi\Exception\JokeException;
+use BlaguesApi\JokeTypes;
+use BlaguesApi\Model\Joke;
 
 /**
  * @api

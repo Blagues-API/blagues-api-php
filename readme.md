@@ -15,11 +15,11 @@ Vous pouvez récupérer votre token d'authentification sur le site officiel http
 
 declare(strict_types=1);
 
-use Zuruuh\BlaguesApi\Factory\BlaguesApiFactory;
+use BlaguesApi\Factory\BlaguesApiFactory;
 
 $blaguesApi = BlaguesApiFactory::create($_ENV['TOKEN']);
 
-$joke = $blaguesApi->getRandom(); // Renvoies une instance de la classe Blagues\Model\Joke
+$joke = $blaguesApi->getRandom(); // Renvoies une instance de la classe BlaguesApi\Model\Joke
 
 var_dump($joke->getJoke()); // Renvoie le contenu de la blague.
 var_dump($joke->getAnswer()); // Renvoie la réponse à la blague si il y en a une.
@@ -30,8 +30,8 @@ var_dump($joke->getAnswer()); // Renvoie la réponse à la blague si il y en a u
 
 declare(strict_types=1);
 
-use Zuruuh\BlaguesApi\Model\Joke;
-use Zuruuh\BlaguesApi\Factory\BlaguesApiFactory;
+use BlaguesApi\Model\Joke;
+use BlaguesApi\Factory\BlaguesApiFactory;
 
 $blaguesApi = BlaguesApiFactory::create($_ENV['TOKEN']);
 
@@ -54,7 +54,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Zuruuh\BlaguesApi\Factory\BlaguesApiFactory;
+use BlaguesApi\Factory\BlaguesApiFactory;
 
 class JokeController extends AbstractController
 {
@@ -76,8 +76,8 @@ Exemple Symfony avec injection de dépendance + factory
 ```yaml
 # config/services.yaml
 services:
-  Zuruuh\BlaguesApi\BlaguesApiInterface:
-    factory: ['Zuruuh\BlaguesApi\BlaguesApiFactory', create]
+  BlaguesApi\BlaguesApiInterface:
+    factory: ['BlaguesApi\BlaguesApiFactory', create]
     arguments: ['%env(BLAGUES_API_TOKEN)%']
 ```
 ```php
@@ -91,7 +91,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Zuruuh\BlaguesApi\BlaguesApiInterface;
+use BlaguesApi\BlaguesApiInterface;
 
 class JokeController extends AbstractController
 {

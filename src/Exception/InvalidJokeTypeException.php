@@ -2,6 +2,6 @@
 
 declare(strict_types=1);
 
-namespace Zuruuh\BlaguesApi\Exception;
+namespace BlaguesApi\Exception;
 
 final class InvalidJokeTypeException extends JokeException {}

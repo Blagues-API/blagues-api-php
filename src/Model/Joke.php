@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Zuruuh\BlaguesApi\Model;
+namespace BlaguesApi\Model;
 
-use Zuruuh\BlaguesApi\JokeTypes;
+use BlaguesApi\JokeTypes;
 
 /**
  * @immutable

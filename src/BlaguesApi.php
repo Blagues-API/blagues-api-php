@@ -2,26 +2,28 @@
 
 declare(strict_types=1);
 
-namespace Zuruuh\BlaguesApi;
+namespace BlaguesApi;
 
+use BlaguesApi\Exception\InvalidJokeTypeException;
+use BlaguesApi\Exception\JokeException;
+use BlaguesApi\Factory\BlaguesApiFactory;
+use BlaguesApi\Factory\BlaguesApiFactoryInterface;
+use BlaguesApi\Http\HttpClient;
+use BlaguesApi\JokeTypes;
+use BlaguesApi\Model\Joke;
+use BlaguesApi\Model\JokeCount;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Zuruuh\BlaguesApi\Exception\InvalidJokeTypeException;
-use Zuruuh\BlaguesApi\Exception\JokeException;
-use Zuruuh\BlaguesApi\Http\HttpClient;
-use Zuruuh\BlaguesApi\JokeTypes;
-use Zuruuh\BlaguesApi\Model\Joke;
-use Zuruuh\BlaguesApi\Model\JokeCount;
 
 /**
  * @immutable
  * @api
  */
-final class BlaguesApi implements BlaguesApiInterface
+final class BlaguesApi implements BlaguesApiInterface, BlaguesApiFactoryInterface
 {
     private HttpClient $httpClient;
 
@@ -51,7 +53,6 @@ final class BlaguesApi implements BlaguesApiInterface
             $this->validateType($type);
         }
 
-        /* $joke = $this->request('/api/random?disallow=' . $query); */
         $query = '';
         foreach ($disallowed as $type) {
             $query .= "disallow=$type&";
@@ -136,6 +137,16 @@ final class BlaguesApi implements BlaguesApiInterface
                 previous: $exception
             );
         }
+    }
+
+    public static function create(
+        string $authToken,
+        ?ClientInterface $httpClient = null,
+        ?RequestFactoryInterface $requestFactory = null,
+        ?UriFactoryInterface $uriFactory = null,
+        ?SerializerInterface $serializer = null
+    ): BlaguesApiInterface {
+        return BlaguesApiFactory::create($authToken, $httpClient, $requestFactory, $uriFactory, $serializer);
     }
 
     /**

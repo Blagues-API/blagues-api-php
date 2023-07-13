@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Zuruuh\BlaguesApi\Http;
+namespace BlaguesApi\Http;
 
+use BlaguesApi\Exception\InvalidTokenException;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Zuruuh\BlaguesApi\Exception\InvalidTokenException;
 
 /**
  * @internal

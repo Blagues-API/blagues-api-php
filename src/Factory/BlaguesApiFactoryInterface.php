@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Zuruuh\BlaguesApi\Factory;
+namespace BlaguesApi\Factory;
 
+use BlaguesApi\BlaguesApiInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Zuruuh\BlaguesApi\BlaguesApiInterface;
 
 /**
  * @api
@@ -16,6 +16,7 @@ use Zuruuh\BlaguesApi\BlaguesApiInterface;
 interface BlaguesApiFactoryInterface
 {
     /**
+     * @api
      * @param non-empty-string $authToken
      */
     public static function create(

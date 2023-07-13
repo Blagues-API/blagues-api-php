@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Zuruuh\BlaguesApi\Model;
+namespace BlaguesApi\Model;
 
 /**
  * @internal
+ * @api
  */
 final class JokeCount
 {

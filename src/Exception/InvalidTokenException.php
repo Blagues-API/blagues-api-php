@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zuruuh\BlaguesApi\Exception;
+namespace BlaguesApi\Exception;
 
 use Throwable;
 

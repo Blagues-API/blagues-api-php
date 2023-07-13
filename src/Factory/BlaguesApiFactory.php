@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Zuruuh\BlaguesApi\Factory;
+namespace BlaguesApi\Factory;
 
+use BlaguesApi\BlaguesApi;
+use BlaguesApi\BlaguesApiInterface;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use Psr\Http\Client\ClientInterface;
@@ -13,8 +15,6 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
-use Zuruuh\BlaguesApi\BlaguesApi;
-use Zuruuh\BlaguesApi\BlaguesApiInterface;
 
 /**
  * @api
