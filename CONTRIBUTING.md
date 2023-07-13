@@ -2,7 +2,7 @@ Si vous voulez contribuer au projet, n'hésitez pas à jeter un oeil aux [issues
 
 Voici le workflow que vous devez suivre si vous voulez que votre feature soit acceptée.
 
-## 2 - Linters
+## Linters
 Ce projet utilise phpstan, psalm, et php cs fixer, assurez vous que les 3 outils fonctionnent correctement **avant** et **après** vos ajouts:
 ```bash
 composer install
