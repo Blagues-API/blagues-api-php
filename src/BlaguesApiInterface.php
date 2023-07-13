@@ -2,34 +2,42 @@
 
 declare(strict_types=1);
 
-namespace Blagues;
+namespace BlaguesApi;
 
-use Blagues\Models\Joke;
+use BlaguesApi\Exception\JokeException;
+use BlaguesApi\JokeTypes;
+use BlaguesApi\Model\Joke;
 
-interface BlaguesApiInterface extends JokeTypeInterface
+/**
+ * @api
+ */
+interface BlaguesApiInterface
 {
     /**
-     * Get a random joke.
+     * @param list<value-of<JokeTypes::TYPES>> $disallowed The joke types that are not allowed to be returned.
      *
-     * @phpstan-param value-of<JokeTypeInterface::TYPES>[] $disallowed
-     *                The joke types that are not allowed to be returned.
+     * @throws JokeException
      */
     public function getRandom(array $disallowed = []): Joke;
 
     /**
-     * Get a random joke by its type.
+     * @param value-of<JokeTypes::TYPES> $type
      *
-     * @phpstan-param value-of<JokeTypeInterface::TYPES> $type
+     * @throws JokeException
      */
     public function getByType(string $type): Joke;
 
     /**
-     * Finds a joke by its id.
+     * @param positive-int $id
+     *
+     * @throws JokeException
      */
     public function getById(int $id): ?Joke;
 
     /**
-     * Returns the total count of jokes.
+     * @return positive-int
+     *
+     * @throws JokeException
      */
     public function count(): int;
 }

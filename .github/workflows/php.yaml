@@ -1,0 +1,48 @@
+name: Lint & Static Analysis
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Cache Composer packages in tools dir
+      id: composer-tools-cache
+      uses: actions/cache@v3
+      with:
+        path: tools/vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}-tools
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Install dependencies
+      run: |
+        composer install --prefer-dist --no-progress
+        composer install --prefer-dist --no-progress --working-dir=tools
+
+    - name: Lint w/ phpcs fixer
+      run: ./tools/vendor/bin/php-cs-fixer fix --dry-run --config ./tools/.php-cs-fixer.dist.php
+
+    - name: phpstan static analysis
+      run: ./tools/vendor/bin/phpstan analyze -c ./tools/phpstan.dist.neon --no-progress
+
+    - name: psalm static analysis
+      run: ./tools/vendor/bin/psalm.phar -c ./tools/psalm.dist.xml

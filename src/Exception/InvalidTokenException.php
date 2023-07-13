@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Blagues\Exceptions;
+namespace BlaguesApi\Exception;
 
 use Throwable;
 
-class InvalidTokenException extends JokeException
+final class InvalidTokenException extends JokeException
 {
     public function __construct(Throwable $previous = null)
     {
