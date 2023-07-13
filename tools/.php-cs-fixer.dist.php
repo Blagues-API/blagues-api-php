@@ -19,6 +19,7 @@ $config = (new \PhpCsFixer\Config())
         '@PHP80Migration' => true,
         '@PHP80Migration:risky' => true,
         'single_line_empty_body' => true,
+        'ordered_imports' => true,
     ])
     ->setFinder($finder)
 ;
