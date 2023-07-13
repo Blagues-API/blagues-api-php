@@ -4,4 +4,4 @@
 /.github export-ignore
 /.gitignore export-ignore
 /.gitattributes export-ignore
-/.env export-ignore
+/CODEOWNERS export-ignore
